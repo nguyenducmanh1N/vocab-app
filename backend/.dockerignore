@@ -1,0 +1,16 @@
+# Không bao giờ đưa secret vào image: biến môi trường khai báo trên host
+.env
+.env.*
+!.env.example
+
+# Môi trường và cache trên máy dev
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Không cần khi chạy
+tests/
+Dockerfile
+.dockerignore
