@@ -1,0 +1,29 @@
+{
+  "words": [
+    {
+      "term": "receive",
+      "part_of_speech": "verb",
+      "ipa": "/rɪˈsiːv/",
+      "meaning_vi": "nhận; thu được",
+      "synonyms": ["get", "obtain"],
+      "examples": [{"en": "Did you receive my email?", "vi": "Bạn đã nhận được email của tôi chưa?"}]
+    },
+    {
+      "term": "deadline",
+      "part_of_speech": "noun",
+      "ipa": "/ˈdedlaɪn/",
+      "meaning_vi": "hạn chót",
+      "synonyms": [],
+      "examples": [{"en": "The deadline is Friday.", "vi": "Hạn chót là thứ Sáu."}]
+    },
+    {
+      "term": "elephant",
+      "part_of_speech": "noun",
+      "ipa": "/ˈelɪfənt/",
+      "meaning_vi": "con voi",
+      "synonyms": [],
+      "examples": [{"en": "An elephant is big.", "vi": "Con voi rất to."}]
+    }
+  ],
+  "unknown_terms": ["recieve", "xyzzyq"]
+}
