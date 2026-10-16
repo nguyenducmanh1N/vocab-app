@@ -1,0 +1,15 @@
+{
+  "overall": 2,
+  "pronunciation": {"score": 2, "comment_vi": "Từ \"barista\" bị đọc thành cụm khác nên khó nghe ra."},
+  "stress": {"score": 2, "comment_vi": "Trọng âm của \"barista\" chưa rơi vào âm tiết thứ hai."},
+  "fluency": {"score": 3, "comment_vi": "Tốc độ ổn nhưng còn ngập ngừng ở đầu câu."},
+  "fixes": [
+    {
+      "word": "barista",
+      "ipa": "/bəˈrɪstə/",
+      "issue_vi": "Đọc nhầm thành \"be ready\".",
+      "tip_vi": "Tách 3 âm tiết bə-RIS-tə, nhấn mạnh âm giữa."
+    }
+  ],
+  "summary_vi": "Bạn đọc được phần lớn câu. Luyện thêm từ \"barista\" rồi thử lại nhé!"
+}

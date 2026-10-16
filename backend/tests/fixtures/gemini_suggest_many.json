@@ -1,0 +1,160 @@
+{
+  "words": [
+    {
+      "term": "espresso",
+      "part_of_speech": "noun",
+      "ipa": "/espresso/",
+      "meaning_vi": "nghĩa của espresso",
+      "synonyms": [],
+      "examples": [
+        {
+          "en": "I like the espresso here.",
+          "vi": "Tôi thích espresso ở đây."
+        }
+      ]
+    },
+    {
+      "term": "latte",
+      "part_of_speech": "noun",
+      "ipa": "/latte/",
+      "meaning_vi": "nghĩa của latte",
+      "synonyms": [],
+      "examples": [
+        {
+          "en": "I like the latte here.",
+          "vi": "Tôi thích latte ở đây."
+        }
+      ]
+    },
+    {
+      "term": "cappuccino",
+      "part_of_speech": "noun",
+      "ipa": "/cappuccino/",
+      "meaning_vi": "nghĩa của cappuccino",
+      "synonyms": [],
+      "examples": [
+        {
+          "en": "I like the cappuccino here.",
+          "vi": "Tôi thích cappuccino ở đây."
+        }
+      ]
+    },
+    {
+      "term": "barista",
+      "part_of_speech": "noun",
+      "ipa": "/barista/",
+      "meaning_vi": "nghĩa của barista",
+      "synonyms": [],
+      "examples": [
+        {
+          "en": "I like the barista here.",
+          "vi": "Tôi thích barista ở đây."
+        }
+      ]
+    },
+    {
+      "term": "menu",
+      "part_of_speech": "noun",
+      "ipa": "/menu/",
+      "meaning_vi": "nghĩa của menu",
+      "synonyms": [],
+      "examples": [
+        {
+          "en": "I like the menu here.",
+          "vi": "Tôi thích menu ở đây."
+        }
+      ]
+    },
+    {
+      "term": "receipt",
+      "part_of_speech": "noun",
+      "ipa": "/receipt/",
+      "meaning_vi": "nghĩa của receipt",
+      "synonyms": [],
+      "examples": [
+        {
+          "en": "I like the receipt here.",
+          "vi": "Tôi thích receipt ở đây."
+        }
+      ]
+    },
+    {
+      "term": "straw",
+      "part_of_speech": "noun",
+      "ipa": "/straw/",
+      "meaning_vi": "nghĩa của straw",
+      "synonyms": [],
+      "examples": [
+        {
+          "en": "I like the straw here.",
+          "vi": "Tôi thích straw ở đây."
+        }
+      ]
+    },
+    {
+      "term": "napkin",
+      "part_of_speech": "noun",
+      "ipa": "/napkin/",
+      "meaning_vi": "nghĩa của napkin",
+      "synonyms": [],
+      "examples": [
+        {
+          "en": "I like the napkin here.",
+          "vi": "Tôi thích napkin ở đây."
+        }
+      ]
+    },
+    {
+      "term": "decaf",
+      "part_of_speech": "noun",
+      "ipa": "/decaf/",
+      "meaning_vi": "nghĩa của decaf",
+      "synonyms": [],
+      "examples": [
+        {
+          "en": "I like the decaf here.",
+          "vi": "Tôi thích decaf ở đây."
+        }
+      ]
+    },
+    {
+      "term": "refill",
+      "part_of_speech": "noun",
+      "ipa": "/refill/",
+      "meaning_vi": "nghĩa của refill",
+      "synonyms": [],
+      "examples": [
+        {
+          "en": "I like the refill here.",
+          "vi": "Tôi thích refill ở đây."
+        }
+      ]
+    },
+    {
+      "term": "tip",
+      "part_of_speech": "noun",
+      "ipa": "/tip/",
+      "meaning_vi": "nghĩa của tip",
+      "synonyms": [],
+      "examples": [
+        {
+          "en": "I like the tip here.",
+          "vi": "Tôi thích tip ở đây."
+        }
+      ]
+    },
+    {
+      "term": "queue",
+      "part_of_speech": "noun",
+      "ipa": "/queue/",
+      "meaning_vi": "nghĩa của queue",
+      "synonyms": [],
+      "examples": [
+        {
+          "en": "I like the queue here.",
+          "vi": "Tôi thích queue ở đây."
+        }
+      ]
+    }
+  ]
+}

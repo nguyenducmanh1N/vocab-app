@@ -1,0 +1,35 @@
+{
+  "words": [
+    {
+      "term": "barista",
+      "part_of_speech": "noun",
+      "ipa": "/bəˈriːstə/",
+      "meaning_vi": "nhân viên pha chế cà phê",
+      "synonyms": ["coffee maker"],
+      "examples": [
+        {"en": "The barista made me a perfect latte.", "vi": "Nhân viên pha chế làm cho tôi một ly latte hoàn hảo."}
+      ]
+    },
+    {
+      "term": "to go",
+      "part_of_speech": "phrase",
+      "ipa": "/tə ɡoʊ/",
+      "meaning_vi": "mang đi",
+      "synonyms": ["takeaway", "takeout"],
+      "examples": [
+        {"en": "Can I get a cappuccino to go?", "vi": "Cho tôi một ly cappuccino mang đi được không?"},
+        {"en": "Is this for here or to go?", "vi": "Bạn dùng ở đây hay mang đi?"}
+      ]
+    },
+    {
+      "term": "refill",
+      "part_of_speech": "noun",
+      "ipa": "/ˈriːfɪl/",
+      "meaning_vi": "lần rót thêm; ly thêm",
+      "synonyms": ["top-up"],
+      "examples": [
+        {"en": "Free refills are only for drip coffee.", "vi": "Rót thêm miễn phí chỉ áp dụng cho cà phê phin."}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "words": [
+    {
+      "term": "Deadline",
+      "part_of_speech": "Noun",
+      "ipa": "/ˈdedlaɪn/",
+      "meaning_vi": "hạn chót; thời hạn cuối cùng",
+      "synonyms": ["due date", "time limit", "deadline"],
+      "examples": [
+        {"en": "We must finish the report before the deadline.", "vi": "Chúng ta phải xong báo cáo trước hạn chót."},
+        {"en": "The deadline is next Friday.", "vi": "Hạn chót là thứ Sáu tuần sau."}
+      ]
+    },
+    {
+      "term": "  meet   the deadline ",
+      "part_of_speech": "phrase",
+      "ipa": "/miːt ðə ˈdedlaɪn/",
+      "meaning_vi": "kịp hạn chót",
+      "synonyms": [],
+      "examples": [
+        {"en": "Can you finish it on time?", "vi": "Bạn có làm xong kịp không?"}
+      ]
+    }
+  ],
+  "unknown_terms": ["xyzzyq"]
+}
