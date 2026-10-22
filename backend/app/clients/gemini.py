@@ -42,6 +42,40 @@ class EnrichResult(BaseModel):
     unknown_terms: list[str]
 
 
+class InsightFamilyItem(BaseModel):
+    term: str = Field(description="Another form from the same root, lowercase")
+    part_of_speech: str
+    meaning_vi: str
+    example_en: str = Field(description="One example (max 12 words) that uses this exact form")
+
+
+class InsightCollocation(BaseModel):
+    phrase: str = Field(description="Collocation or fixed phrase that contains the term")
+    meaning_vi: str
+    example_en: str = Field(description="One example (max 12 words) that contains the phrase")
+
+
+class InsightConfusable(BaseModel):
+    term: str = Field(description="English word often confused with the item's term")
+    difference_vi: str = Field(description="One Vietnamese sentence explaining the difference")
+    example_en: str = Field(description="One example with the item's term")
+    other_example_en: str = Field(description="One example with the confusable word")
+
+
+class InsightItem(BaseModel):
+    """Kết quả /ai/insights cho một từ; chỉ các phần được yêu cầu mới có dữ liệu (PLAN.md 9.12)."""
+
+    id: str = Field(description="The id of the input item, unchanged")
+    word_family: list[InsightFamilyItem] = Field(default_factory=list, max_length=5)
+    collocations: list[InsightCollocation] = Field(default_factory=list, max_length=5)
+    mnemonic_vi: str | None = Field(default=None, description="Vietnamese memory aid, max 30 words")
+    confusables: list[InsightConfusable] = Field(default_factory=list, max_length=2)
+
+
+class InsightResult(BaseModel):
+    items: list[InsightItem]
+
+
 class SpeakingTranscript(BaseModel):
     """Lần gọi 1 của nhận xét luyện nói: chỉ chép lời, model không thấy câu mẫu (PLAN.md 9.11)."""
 

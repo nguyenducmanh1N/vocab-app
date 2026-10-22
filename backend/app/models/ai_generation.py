@@ -20,11 +20,11 @@ from app.db.base import Base
 
 
 class AiGeneration(Base):
-    """Mỗi lần gọi AI (gợi ý, tự điền, nhận xét luyện nói); dùng để tính hạn mức và cache (9.7)."""
+    """Mỗi lần gọi AI (gợi ý, tự điền, luyện nói, insight, trích từ); hạn mức và cache (9.7)."""
 
     __tablename__ = "ai_generations"
     __table_args__ = (
-        CheckConstraint("kind IN ('suggest','enrich','speaking')", name="kind"),
+        CheckConstraint("kind IN ('suggest','enrich','speaking','insight','extract')", name="kind"),
         CheckConstraint("status IN ('ok','error')", name="status"),
         Index("ix_ai_generations_cache", "cache_key", text("created_at DESC")),
         Index("ix_ai_generations_user_time", "user_id", "created_at"),

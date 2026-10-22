@@ -8,6 +8,7 @@ import uuid
 from datetime import timedelta
 from typing import Any
 
+from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.clients.dictionary import DictionaryClient
@@ -17,6 +18,8 @@ from app.clients.gemini import (
     EnrichResult,
     GeneratedWord,
     ImageInput,
+    InsightItem,
+    InsightResult,
     SpeakingEvaluation,
     SpeakingTranscript,
     SuggestResult,
@@ -33,13 +36,17 @@ from app.core.text import (
     topic_key,
 )
 from app.core.time import local_today, now_utc, start_of_local_day
-from app.models import AiGeneration, User
+from app.models import AiGeneration, User, Word
 from app.repositories import ai_generation_repository as repo
+from app.repositories import word_repository
 from app.schemas.ai import (
     EnrichIn,
     EnrichOut,
     ExtractIn,
     HistoryItem,
+    InsightsIn,
+    InsightsOut,
+    InsightWordOut,
     QuotaOut,
     SpeakingCriterionOut,
     SpeakingFeedbackIn,
@@ -49,6 +56,7 @@ from app.schemas.ai import (
     SuggestIn,
     SuggestOut,
 )
+from app.schemas.word import Collocation, Confusable, FamilyItem
 from app.services import dictionary_service
 
 SUGGEST_PROMPT = """You are an English vocabulary teacher for Vietnamese learners.
@@ -511,6 +519,187 @@ async def extract(
         cached=False,
         remaining_today=remaining - 1,
         words=await _with_saved(session, user, items),
+    )
+
+
+INSIGHT_PROMPT = """You are an English vocabulary teacher for Vietnamese learners (CEFR {level}).
+For each item below, return only these parts: {parts}.
+Items (id, term, part of speech, Vietnamese meaning): {items_json}
+Rules:
+- word_family: 2-5 other forms from the same root (e.g. decide -> decision, decisive, decisively),
+  each with part_of_speech, a short Vietnamese meaning and one example (max 12 words)
+  that uses that exact form. Return [] if the word has no real family.
+- collocations: 3-5 common collocations or fixed phrases that contain the term,
+  each with a short Vietnamese meaning and one example (max 12 words) that contains the phrase.
+- mnemonic_vi: one short Vietnamese memory aid (max 30 words). Sound-alike Vietnamese words
+  or a vivid image are fine. Do not invent etymology.
+- confusables: 0-2 English words Vietnamese learners often confuse with the term. For each,
+  explain the difference in one Vietnamese sentence, and give one example for the term
+  and one for the other word.
+- Return the id of each item unchanged."""
+
+# Tên phần trong request → tên phần trong prompt và schema của Gemini (9.12).
+INSIGHT_PART_NAMES = {
+    "family": "word_family",
+    "collocations": "collocations",
+    "mnemonic": "mnemonic_vi",
+    "confusables": "confusables",
+}
+
+
+def _valid_family(item: InsightItem) -> list[FamilyItem]:
+    """Bước 3 của 9.12: ví dụ phải chứa đúng dạng từ; mục sai thì bỏ, không báo lỗi."""
+    kept: list[FamilyItem] = []
+    for raw in item.word_family[:5]:
+        term = (_clean(raw.term, 100) or "").lower()
+        example = _clean(raw.example_en, 300) or ""
+        if not term or term not in example.lower():
+            continue
+        try:
+            kept.append(
+                FamilyItem(
+                    term=term,
+                    part_of_speech=_clean(raw.part_of_speech, 20) or "",
+                    meaning_vi=_clean(raw.meaning_vi, 500) or "",
+                    example_en=example,
+                )
+            )
+        except ValidationError:
+            continue
+    return kept
+
+
+def _valid_collocations(item: InsightItem) -> list[Collocation]:
+    kept: list[Collocation] = []
+    for raw in item.collocations[:5]:
+        phrase = _clean(raw.phrase, 100) or ""
+        example = _clean(raw.example_en, 300) or ""
+        if not phrase or phrase.lower() not in example.lower():
+            continue
+        try:
+            kept.append(
+                Collocation(
+                    phrase=phrase, meaning_vi=_clean(raw.meaning_vi, 500) or "", example_en=example
+                )
+            )
+        except ValidationError:
+            continue
+    return kept
+
+
+def _valid_confusables(item: InsightItem, word_term: str) -> list[Confusable]:
+    kept: list[Confusable] = []
+    for raw in item.confusables[:2]:
+        term = (_clean(raw.term, 100) or "").lower()
+        if not term or term == word_term.lower():  # không được trùng chính từ đang học
+            continue
+        try:
+            kept.append(
+                Confusable(
+                    term=term,
+                    difference_vi=_clean(raw.difference_vi, 500) or "",
+                    example_en=_clean(raw.example_en, 300) or "",
+                    other_example_en=_clean(raw.other_example_en, 300) or "",
+                )
+            )
+        except ValidationError:
+            continue
+    return kept
+
+
+def _apply_insight(
+    word: Word, item: InsightItem, parts: list[str], overwrite: bool
+) -> dict[str, Any]:
+    """Bước 4 của 9.12: ghi phần đã kiểm tra vào words; trả dữ liệu đã kiểm tra để lưu log.
+
+    overwrite=False chỉ điền phần đang trống, không đè dữ liệu người dùng đã sửa.
+    """
+    checked: dict[str, Any] = {"word_id": str(word.id)}
+    if "mnemonic" in parts:
+        mnemonic = _clean(item.mnemonic_vi, 300)
+        checked["mnemonic"] = mnemonic
+        if mnemonic and (overwrite or not word.mnemonic):
+            word.mnemonic = mnemonic
+    lists: list[tuple[str, str, list[Any]]] = []
+    if "family" in parts:
+        lists.append(("word_family", "word_family", _valid_family(item)))
+    if "collocations" in parts:
+        lists.append(("collocations", "collocations", _valid_collocations(item)))
+    if "confusables" in parts:
+        lists.append(("confusables", "confusables", _valid_confusables(item, word.term)))
+    for key, attr, values in lists:
+        checked[key] = [v.model_dump() for v in values]
+        if values and (overwrite or not getattr(word, attr)):
+            setattr(word, attr, checked[key])
+    return checked
+
+
+async def insights(
+    session: AsyncSession, user: User, data: InsightsIn, ai: AiClient
+) -> InsightsOut:
+    """Họ từ, cụm đi kèm, mẹo nhớ, từ hay nhầm cho một lô từ, đúng 5 bước ở PLAN.md 9.12."""
+    settings = get_settings()
+    # Bước 1: đồng ý AI đã kiểm tra ở router; còn quyền sở hữu và hạn mức.
+    word_ids = list(dict.fromkeys(data.word_ids))
+    rows = await word_repository.get_many_with_progress(session, user.id, word_ids)
+    if len(rows) != len(word_ids):
+        raise AppError(404, "NOT_FOUND", "Không tìm thấy từ")
+    words = [word for word, _ in rows]
+    remaining = await _check_quota(session, user, "insight", settings.ai_insight_daily_limit)
+
+    # Bước 2: một request Gemini cho cả lô.
+    items_json = json.dumps(
+        [
+            {
+                "id": str(w.id),
+                "term": w.term,
+                "part_of_speech": w.part_of_speech,
+                "meaning_vi": w.meaning_vi,
+            }
+            for w in words
+        ],
+        ensure_ascii=False,
+    )
+    parts = [INSIGHT_PART_NAMES[p] for p in data.parts]
+    prompt = INSIGHT_PROMPT.format(level=user.level, parts=", ".join(parts), items_json=items_json)
+    meta = {"kind": "insight", "level": user.level, "count": len(words)}
+    try:
+        result, model = await ai.generate(prompt, InsightResult)
+    except AppError as exc:
+        await _record(
+            session,
+            user,
+            **meta,
+            model=settings.gemini_model,
+            status="error",
+            error=repr(exc.__cause__ or exc),
+        )
+        raise
+
+    # Bước 3, 4: kiểm tra từng mục rồi ghi vào words (id lạ trong kết quả thì bỏ qua).
+    by_id = {item.id: item for item in result.items}
+    checked = [
+        _apply_insight(word, item, data.parts, data.overwrite)
+        for word in words
+        if (item := by_id.get(str(word.id))) is not None
+    ]
+
+    # Bước 5: _record commit cả log lẫn các từ vừa sửa trong một transaction.
+    await _record(session, user, **meta, model=model, status="ok", result=checked)
+
+    # Trả giá trị đang lưu của các phần được yêu cầu (sau khi gộp), để app cập nhật ngay.
+    return InsightsOut(
+        remaining_today=remaining - 1,
+        words=[
+            InsightWordOut(
+                word_id=word.id,
+                mnemonic=word.mnemonic if "mnemonic" in data.parts else None,
+                word_family=word.word_family if "family" in data.parts else None,
+                collocations=word.collocations if "collocations" in data.parts else None,
+                confusables=word.confusables if "confusables" in data.parts else None,
+            )
+            for word in words
+        ],
     )
 
 

@@ -9,6 +9,8 @@ from app.schemas.ai import (
     EnrichOut,
     ExtractIn,
     HistoryItem,
+    InsightsIn,
+    InsightsOut,
     QuotaOut,
     SpeakingFeedbackIn,
     SpeakingFeedbackOut,
@@ -62,6 +64,12 @@ async def extract(
 ) -> SuggestOut:
     """Lọc từ đáng học trong ảnh (trang sách, biển hiệu…); tính 1 lượt gợi ý."""
     return await ai_service.extract(db, user, data, ai, dictionary)
+
+
+@router.post("/insights")
+async def insights(data: InsightsIn, db: DbSession, user: CurrentUser, ai: Ai) -> InsightsOut:
+    """Họ từ, cụm đi kèm, mẹo nhớ, từ hay nhầm; lưu thẳng vào words, một request một lượt (9.12)."""
+    return await ai_service.insights(db, user, data, ai)
 
 
 @router.post("/speaking-feedback")

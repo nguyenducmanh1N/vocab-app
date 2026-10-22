@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     ai_suggest_daily_limit: int = 20
     ai_enrich_daily_limit: int = 100
     ai_speaking_daily_limit: int = 30
+    ai_insight_daily_limit: int = 50
     ai_consent_version: int = 1  # tăng khi nội dung màn đồng ý đổi → người dùng được hỏi lại
     cors_origins: Annotated[list[str], NoDecode] = ["http://localhost:8081"]
     log_level: str = "INFO"

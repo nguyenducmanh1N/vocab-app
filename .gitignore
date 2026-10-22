@@ -25,3 +25,4 @@ CLAUDE.md
 
 # Markdown docs (local only)
 *.md
+docker-compose.override.yml

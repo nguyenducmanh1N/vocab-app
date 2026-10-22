@@ -21,6 +21,7 @@ AI_ROUTES = [
     ("GET", "/api/v1/ai/history/{generation_id}"),
     ("GET", "/api/v1/ai/quota"),
     ("POST", "/api/v1/ai/extract"),
+    ("POST", "/api/v1/ai/insights"),
     ("POST", "/api/v1/ai/speaking-feedback"),
 ]
 

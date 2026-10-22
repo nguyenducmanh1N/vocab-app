@@ -5,7 +5,7 @@ from typing import Annotated, Literal
 from pydantic import AfterValidator, BaseModel, Field, StringConstraints
 
 from app.schemas.user import Level
-from app.schemas.word import Example
+from app.schemas.word import Collocation, Confusable, Example, FamilyItem
 
 EnrichTerm = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
 
@@ -82,6 +82,36 @@ class ExtractIn(BaseModel):
     mime_type: Literal["image/jpeg", "image/png", "image/webp", "image/heic"] = "image/jpeg"
     level: Level | None = None
     count: Annotated[int, Field(ge=5, le=30)] = 20
+
+
+InsightPart = Literal["family", "collocations", "mnemonic", "confusables"]
+
+
+def _dedupe_parts(values: list[InsightPart]) -> list[InsightPart]:
+    return list(dict.fromkeys(values))
+
+
+class InsightsIn(BaseModel):
+    """Bổ sung họ từ, cụm đi kèm, mẹo nhớ, từ hay nhầm cho một lô từ (PLAN.md 9.12)."""
+
+    word_ids: list[uuid.UUID] = Field(min_length=1, max_length=20)
+    parts: Annotated[list[InsightPart], Field(min_length=1), AfterValidator(_dedupe_parts)]
+    overwrite: bool = False
+
+
+class InsightWordOut(BaseModel):
+    """Giá trị đã lưu của các phần được yêu cầu; phần không yêu cầu để null."""
+
+    word_id: uuid.UUID
+    mnemonic: str | None = None
+    word_family: list[FamilyItem] | None = None
+    collocations: list[Collocation] | None = None
+    confusables: list[Confusable] | None = None
+
+
+class InsightsOut(BaseModel):
+    remaining_today: int
+    words: list[InsightWordOut]
 
 
 class SpeakingFeedbackIn(BaseModel):
